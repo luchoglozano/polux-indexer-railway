@@ -6,7 +6,7 @@ from langchain.vectorstores import Chroma
 
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
-pdf_path = "docs/tu-libro.pdf"
+pdf_path = "docs/nagata_cap1.pdf"
 loader = PyPDFLoader(pdf_path)
 documents = loader.load()
 
