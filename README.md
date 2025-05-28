@@ -16,3 +16,4 @@ Este proyecto genera una base vectorial desde archivos PDF usando LangChain, Chr
    ```
 
 Esto generará una carpeta `chroma_db/` con la base vectorial persistente.
+# trigger deploy
