@@ -7,26 +7,29 @@ import os
 
 app = FastAPI()
 
-# Inicializar vectorstore desde la base persistida
+# Healthcheck básico
+@app.get("/")
+def read_root():
+    return {"status": "ok"}
+
+# Configuración de vectores
 vectordb = Chroma(
     persist_directory="./chroma_db",
     embedding_function=OpenAIEmbeddings()
 )
 
-# Crear el QA chain con GPT-4
+# Configurar el modelo de QA
 qa = RetrievalQA.from_chain_type(
     llm=ChatOpenAI(model="gpt-4", temperature=0),
     retriever=vectordb.as_retriever()
 )
 
+# Esquema de la pregunta
 class Question(BaseModel):
     query: str
 
+# Endpoint principal
 @app.post("/ask")
 def ask(question: Question):
     response = qa.run(question.query)
     return {"response": response}
-
-@app.get("/")
-def healthcheck():
-    return {"status": "ok"}
