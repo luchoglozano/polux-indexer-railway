@@ -1,8 +1,7 @@
 fastapi
 uvicorn
-langchain
-langchain-community
-openai
+langchain==0.1.16
+langchain-openai==0.1.1
+langchain-community==0.0.16
 tiktoken
-chromadb
-pydantic
+chromadb==0.4.24
