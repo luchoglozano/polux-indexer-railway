@@ -1,24 +1,37 @@
 import os
-from langchain.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
 
-os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+# Ruta base a documentos
+docs_path = "docs"
+persist_directory = "chroma_db"
 
-pdf_path = "docs/nagata_cap1.pdf"
-loader = PyPDFLoader(pdf_path)
-documents = loader.load()
+def load_and_split_documents():
+    all_docs = []
+    for file in os.listdir(docs_path):
+        if file.endswith(".pdf"):
+            full_path = os.path.join(docs_path, file)
+            loader = PyPDFLoader(full_path)
+            pages = loader.load()
+            all_docs.extend(pages)
+    return all_docs
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-docs = text_splitter.split_documents(documents)
+def main():
+    print("🧠 Cargando documentos PDF...")
+    documents = load_and_split_documents()
 
-embedding = OpenAIEmbeddings()
-vectordb = Chroma.from_documents(
-    documents=docs,
-    embedding=embedding,
-    persist_directory="./chroma_db"
-)
-vectordb.persist()
+    print(f"📄 Documentos encontrados: {len(documents)}")
+    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    texts = splitter.split_documents(documents)
 
-print("✅ Base vectorial generada exitosamente.")
+    print(f"✂️ Fragmentos generados: {len(texts)}")
+    embeddings = OpenAIEmbeddings()
+    vectordb = Chroma.from_documents(texts, embeddings, persist_directory=persist_directory)
+
+    vectordb.persist()
+    print("✅ Base vectorial guardada en:", persist_directory)
+
+if __name__ == "__main__":
+    main()
